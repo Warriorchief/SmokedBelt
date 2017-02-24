@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    .clickables{
+      position:absolute; top:30px;right:30px;
+      font-size:20px;
+    }
+    .new_secret{
+      border:2px solid darkorange;
+    }
+    h2{
+      font-size:55px;
+      color:navy;
+    }
+    input{
+      border:1px solid pink;
+    }
+    h3{
+      color:darkorange;
+    }
+    td form{
+      display: inline-block;
+    }
+    button{
+      border:2px solid pink;
+      font-style: oblique;
+    }
+    #x{
+      padding:5px;
+      font-weight:bold; color:blue;
+      font-size:18px;
+      position:relative;bottom:12px;left:15px;
+      font-style:oblique;
+    }
+    #q{
+      padding-top:12px;
+      position:relative; top:5px;
+      border:1px solid gold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Hello, <%= @user.name %> !</h1><br>
+
+  <div class="clickables">
+    <a href="/logout">Log Out</a><br><br>
+  </div>
+
+  <form class="new_secret" action="/new_idea" method="post">
+    <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>">
+    <textarea id="q" class="form-control" rows="2" cols="50" name="content" placeholder="Post something witty here..."></textarea>
+    <input id="x" type="submit" value="Idea!">
+  </form><br><br><br>
+
+  <div class="container">
+    <h2>All Ideas</h2>
+    <hr>
+    <table class="table table-bordered" data-sort-name="likes" data-sort-order="desc">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Content</th>
+          <th data-field="likes" data-sortable="true">#Likes</th>
+          <th>Action/Status</th>
+        </tr>
+      </thead>
+      <tbody><br>
+        <% for i in @ideas %>
+          <tr>
+            <td><a href="/show_user/<%=i.user_id%>"><%=i.user.alias%></a> says:</td>
+            <td><%= i.content %></td>
+            <td>liked <a href="/show_idea_likers/<%=i.id%>"><%=i.likes.count%></a> times</td>
+            <td>
+              <% if i.user_id==@user.id %>
+                <form action="/delete_idea/<%=i.id%>" method="post">
+                  <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>">
+                  <button style="border:2px solid red;" type="submit">Delete</button>
+                </form>
+                <form action="/like_idea/<%=i.id%>" method="post">
+                  <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>">
+                  <button style="border:2px solid green;" type="submit">Like</button>
+                </form>
+              <% else %>
+                <form action="/like_idea/<%=i.id%>" method="post">
+                  <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>">
+                  <button style="border:2px solid green;" type="submit">Like</button>
+                </form>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>
